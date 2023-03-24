@@ -1,4 +1,4 @@
-module go_playlist_gRPC
+module go_Playlist_gRPC
 
 go 1.19
 

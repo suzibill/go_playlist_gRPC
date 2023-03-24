@@ -1,2 +1,2 @@
-# go_playlist_gRPC
+# go_Playlist_gRPC
 pet-project
