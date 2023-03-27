@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	Play int = iota + 1
+	Play int32 = iota + 1
 	Pause
 	Next
 	Prev
@@ -21,7 +21,7 @@ const (
 )
 
 type Commands struct {
-	command int
+	command int32
 	song    Song
 }
 
@@ -31,6 +31,7 @@ type Playlist struct {
 }
 
 type Song struct {
+	id       int64
 	name     string
 	duration time.Duration
 }
@@ -72,14 +73,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	commandCh := make(chan Commands)
 	go doWork(ctx, commandCh)
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song1", duration: 1 * time.Second}}
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song2", duration: 1 * time.Second}}
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song3", duration: 1 * time.Second}}
+	commandCh <- Commands{command: AddSong, song: Song{name: "Song1", duration: 7 * time.Second}}
+	commandCh <- Commands{command: AddSong, song: Song{name: "Song2", duration: 7 * time.Second}}
+	commandCh <- Commands{command: AddSong, song: Song{name: "Song3", duration: 7 * time.Second}}
 	commandCh <- Commands{command: Play}
 	time.Sleep(3 * time.Second)
 	commandCh <- Commands{command: Next}
+	time.Sleep(1 * time.Second)
 	commandCh <- Commands{command: AddSong, song: Song{name: "Song4", duration: 1 * time.Second}}
-	commandCh <- Commands{command: Prev}
+	//commandCh <- Commands{command: Prev}
 
 	time.Sleep(20 * time.Second)
 	cancel()
