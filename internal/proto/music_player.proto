@@ -5,11 +5,11 @@ package music_player;
 option go_package = "/music_player";
 
 service MusicPlayer {
-  rpc play(Empty) returns (Empty);
-  rpc pause(Empty) returns (Empty);
-  rpc next(Empty) returns (Empty);
-  rpc prev(Empty) returns (Empty);
-  rpc addSong(SongRequest) returns (Empty);
+  rpc play(Empty) returns (PlaylistResponse);
+  rpc pause(Empty) returns (PlaylistResponse);
+  rpc next(Empty) returns (PlaylistResponse);
+  rpc prev(Empty) returns (PlaylistResponse);
+  rpc addSong(SongRequest) returns (PlaylistResponse);
 }
 
 
@@ -21,6 +21,7 @@ message SongRequest {
 message Empty {
 }
 
-message PlayResponse {
-
+message PlaylistResponse {
+  int32 code = 1;
+  string message = 2;
 }

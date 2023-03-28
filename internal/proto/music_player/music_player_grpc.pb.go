@@ -22,11 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MusicPlayerClient interface {
-	Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
-	AddSong(ctx context.Context, in *SongRequest, opts ...grpc.CallOption) (*Empty, error)
+	Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error)
+	Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error)
+	Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error)
+	Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error)
+	AddSong(ctx context.Context, in *SongRequest, opts ...grpc.CallOption) (*PlaylistResponse, error)
 }
 
 type musicPlayerClient struct {
@@ -37,8 +37,8 @@ func NewMusicPlayerClient(cc grpc.ClientConnInterface) MusicPlayerClient {
 	return &musicPlayerClient{cc}
 }
 
-func (c *musicPlayerClient) Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *musicPlayerClient) Play(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error) {
+	out := new(PlaylistResponse)
 	err := c.cc.Invoke(ctx, "/music_player.MusicPlayer/play", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,8 +46,8 @@ func (c *musicPlayerClient) Play(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *musicPlayerClient) Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *musicPlayerClient) Pause(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error) {
+	out := new(PlaylistResponse)
 	err := c.cc.Invoke(ctx, "/music_player.MusicPlayer/pause", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -55,8 +55,8 @@ func (c *musicPlayerClient) Pause(ctx context.Context, in *Empty, opts ...grpc.C
 	return out, nil
 }
 
-func (c *musicPlayerClient) Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *musicPlayerClient) Next(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error) {
+	out := new(PlaylistResponse)
 	err := c.cc.Invoke(ctx, "/music_player.MusicPlayer/next", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *musicPlayerClient) Next(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *musicPlayerClient) Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *musicPlayerClient) Prev(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*PlaylistResponse, error) {
+	out := new(PlaylistResponse)
 	err := c.cc.Invoke(ctx, "/music_player.MusicPlayer/prev", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -73,8 +73,8 @@ func (c *musicPlayerClient) Prev(ctx context.Context, in *Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *musicPlayerClient) AddSong(ctx context.Context, in *SongRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *musicPlayerClient) AddSong(ctx context.Context, in *SongRequest, opts ...grpc.CallOption) (*PlaylistResponse, error) {
+	out := new(PlaylistResponse)
 	err := c.cc.Invoke(ctx, "/music_player.MusicPlayer/addSong", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -86,11 +86,11 @@ func (c *musicPlayerClient) AddSong(ctx context.Context, in *SongRequest, opts .
 // All implementations must embed UnimplementedMusicPlayerServer
 // for forward compatibility
 type MusicPlayerServer interface {
-	Play(context.Context, *Empty) (*Empty, error)
-	Pause(context.Context, *Empty) (*Empty, error)
-	Next(context.Context, *Empty) (*Empty, error)
-	Prev(context.Context, *Empty) (*Empty, error)
-	AddSong(context.Context, *SongRequest) (*Empty, error)
+	Play(context.Context, *Empty) (*PlaylistResponse, error)
+	Pause(context.Context, *Empty) (*PlaylistResponse, error)
+	Next(context.Context, *Empty) (*PlaylistResponse, error)
+	Prev(context.Context, *Empty) (*PlaylistResponse, error)
+	AddSong(context.Context, *SongRequest) (*PlaylistResponse, error)
 	mustEmbedUnimplementedMusicPlayerServer()
 }
 
@@ -98,19 +98,19 @@ type MusicPlayerServer interface {
 type UnimplementedMusicPlayerServer struct {
 }
 
-func (UnimplementedMusicPlayerServer) Play(context.Context, *Empty) (*Empty, error) {
+func (UnimplementedMusicPlayerServer) Play(context.Context, *Empty) (*PlaylistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Play not implemented")
 }
-func (UnimplementedMusicPlayerServer) Pause(context.Context, *Empty) (*Empty, error) {
+func (UnimplementedMusicPlayerServer) Pause(context.Context, *Empty) (*PlaylistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Pause not implemented")
 }
-func (UnimplementedMusicPlayerServer) Next(context.Context, *Empty) (*Empty, error) {
+func (UnimplementedMusicPlayerServer) Next(context.Context, *Empty) (*PlaylistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Next not implemented")
 }
-func (UnimplementedMusicPlayerServer) Prev(context.Context, *Empty) (*Empty, error) {
+func (UnimplementedMusicPlayerServer) Prev(context.Context, *Empty) (*PlaylistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Prev not implemented")
 }
-func (UnimplementedMusicPlayerServer) AddSong(context.Context, *SongRequest) (*Empty, error) {
+func (UnimplementedMusicPlayerServer) AddSong(context.Context, *SongRequest) (*PlaylistResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSong not implemented")
 }
 func (UnimplementedMusicPlayerServer) mustEmbedUnimplementedMusicPlayerServer() {}

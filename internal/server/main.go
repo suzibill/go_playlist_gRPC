@@ -5,40 +5,48 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"go_Playlist_gRPC/internal/playlist"
 	pb "go_Playlist_gRPC/internal/proto/music_player"
 )
 
 type server struct {
 	pb.UnimplementedMusicPlayerServer
+	Cmd chan playlist.Commands
 }
 
-func (s *server) Play(ctx context.Context, e *pb.Empty) (*pb.Empty, error) {
+func (s server) Play(ctx context.Context, e *pb.Empty) (*pb.PlaylistResponse, error) {
 	fmt.Println("Play")
-	return &pb.Empty{}, nil
+	s.Cmd <- playlist.Commands{Command: playlist.Play}
+	return &pb.PlaylistResponse{}, nil
 }
 
-func (s *server) Pause(ctx context.Context, e *pb.Empty) (*pb.Empty, error) {
+func (s server) Pause(ctx context.Context, e *pb.Empty) (*pb.PlaylistResponse, error) {
 	fmt.Println("Pause")
-	return &pb.Empty{}, nil
+	s.Cmd <- playlist.Commands{Command: playlist.Pause}
+	return &pb.PlaylistResponse{}, nil
 }
 
-func (s *server) Next(ctx context.Context, e *pb.Empty) (*pb.Empty, error) {
+func (s server) Next(ctx context.Context, e *pb.Empty) (*pb.PlaylistResponse, error) {
 	fmt.Println("Next")
-	return &pb.Empty{}, nil
+	s.Cmd <- playlist.Commands{Command: playlist.Next}
+	return &pb.PlaylistResponse{}, nil
 }
 
-func (s *server) Prev(ctx context.Context, e *pb.Empty) (*pb.Empty, error) {
+func (s server) Prev(ctx context.Context, e *pb.Empty) (*pb.PlaylistResponse, error) {
 	fmt.Println("Prev")
-	return &pb.Empty{}, nil
+	s.Cmd <- playlist.Commands{Command: playlist.Prev}
+	return &pb.PlaylistResponse{}, nil
 }
 
-func (s *server) AddSong(ctx context.Context, req *pb.SongRequest) (*pb.Empty, error) {
+func (s server) AddSong(ctx context.Context, req *pb.SongRequest) (*pb.PlaylistResponse, error) {
 	fmt.Printf("AddSong: name=%s, duration=%d\n", req.GetName(), req.GetDuration())
-	return &pb.Empty{}, nil
+	s.Cmd <- playlist.Commands{Command: playlist.AddSong, Song: playlist.Song{Name: req.GetName(), Duration: time.Duration(req.GetDuration())}}
+	return &pb.PlaylistResponse{}, nil
 }
 
 func main() {
@@ -48,8 +56,14 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterMusicPlayerServer(s, &server{})
+	srv := server{}
+	pb.RegisterMusicPlayerServer(s, &srv)
 	reflection.Register(s)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	srv.Cmd = make(chan playlist.Commands)
+	go playlist.DoWork(ctx, srv.Cmd)
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatal(err)

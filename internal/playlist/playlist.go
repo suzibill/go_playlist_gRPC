@@ -1,4 +1,4 @@
-package main
+package playlist
 
 import (
 	"container/list"
@@ -21,8 +21,8 @@ const (
 )
 
 type Commands struct {
-	command int32
-	song    Song
+	Command int32
+	Song    Song
 }
 
 type Playlist struct {
@@ -31,9 +31,9 @@ type Playlist struct {
 }
 
 type Song struct {
-	id       int64
-	name     string
-	duration time.Duration
+	Id       int64
+	Name     string
+	Duration time.Duration
 }
 
 func (p *Playlist) AddSong(s Song) {
@@ -69,43 +69,46 @@ func (p *Playlist) CurrentSong() *Song {
 	return &tmp
 }
 
-func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	commandCh := make(chan Commands)
-	go doWork(ctx, commandCh)
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song1", duration: 7 * time.Second}}
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song2", duration: 7 * time.Second}}
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song3", duration: 7 * time.Second}}
-	commandCh <- Commands{command: Play}
-	time.Sleep(3 * time.Second)
-	commandCh <- Commands{command: Next}
-	time.Sleep(1 * time.Second)
-	commandCh <- Commands{command: AddSong, song: Song{name: "Song4", duration: 1 * time.Second}}
-	//commandCh <- Commands{command: Prev}
+//
+//func main() {
+//	ctx, cancel := context.WithCancel(context.Background())
+//	commandCh := make(chan Commands)
+//	go doWork(ctx, commandCh)
+//	commandCh <- Commands{command: AddSong, song: Song{name: "Song1", duration: 3 * time.Second}}
+//	commandCh <- Commands{command: AddSong, song: Song{name: "Song2", duration: 3 * time.Second}}
+//	commandCh <- Commands{command: AddSong, song: Song{name: "Song3", duration: 3 * time.Second}}
+//	commandCh <- Commands{command: Play}
+//	time.Sleep(3 * time.Second)
+//	commandCh <- Commands{command: Next}
+//	time.Sleep(1 * time.Second)
+//	commandCh <- Commands{command: AddSong, song: Song{name: "Song4", duration: 1 * time.Second}}
+//	//commandCh <- Commands{command: Prev}
+//
+//	time.Sleep(20 * time.Second)
+//	cancel()
+//	time.Sleep(1 * time.Second)
+//
+//	// graceful shutdown
+//	// нейминг переменных ++
+//	// http сервер
+//	// прологировать что песня началась++
+//	// 100 милисекунд константа++
+//	// вынести повторяющие блоки кода в отдельные функции, либо через анонимные функции, либо через общую структура++
+//
+//}
 
-	time.Sleep(20 * time.Second)
-	cancel()
-	time.Sleep(1 * time.Second)
+func DoWork(ctx context.Context, commandCh <-chan Commands) {
 
-	// graceful shutdown
-	// нейминг переменных ++
-	// http сервер
-	// прологировать что песня началась++
-	// 100 милисекунд константа++
-	// вынести повторяющие блоки кода в отдельные функции, либо через анонимные функции, либо через общую структура++
-
-}
-
-func doWork(ctx context.Context, commandCh <-chan Commands) {
 	duration := int64(0)
 	p := Playlist{songs: list.New()}
 	s := p.CurrentSong()
 	t := time.NewTicker(TikDuration)
+	t.Stop()
 	defer t.Stop()
 
 	ChangeSong := func(s *Song) {
 		if s != nil {
-			duration = int64(s.duration / TikDuration)
+			duration = int64(s.Duration / TikDuration)
 			t.Reset(TikDuration)
 		}
 	}
@@ -113,15 +116,15 @@ func doWork(ctx context.Context, commandCh <-chan Commands) {
 	for {
 		select {
 		case cmd := <-commandCh:
-			switch cmd.command {
+			switch cmd.Command {
 			case Play:
 				t.Reset(TikDuration)
 				if duration == 0 {
 					s = p.CurrentSong()
 					ChangeSong(s)
-					log.Println("Song started", s.name)
+					log.Println("Song started", s.Name)
 				} else {
-					log.Println("Song resumed", s.name)
+					log.Println("Song resumed", s.Name)
 				}
 			case Pause:
 				t.Stop()
@@ -135,8 +138,10 @@ func doWork(ctx context.Context, commandCh <-chan Commands) {
 				ChangeSong(s)
 				log.Println("Prev")
 			case AddSong:
-				p.AddSong(cmd.song)
-				log.Printf("Song added %v", cmd.song.name)
+				p.AddSong(cmd.Song)
+				log.Printf("Song added %v", cmd.Song.Name)
+			default:
+				fmt.Println("wrong !!!")
 			}
 		case <-ctx.Done():
 			log.Println("The end by context")
@@ -145,7 +150,7 @@ func doWork(ctx context.Context, commandCh <-chan Commands) {
 			duration--
 			fmt.Printf("Tik ")
 			if duration == 0 {
-				log.Printf("end of song %v", s.name)
+				log.Printf("end of song %v", s.Name)
 				s = p.Next()
 				ChangeSong(s)
 				if s == nil {

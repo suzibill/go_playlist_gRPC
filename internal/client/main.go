@@ -4,6 +4,7 @@ import (
 	"context"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"time"
 
 	pb "go_Playlist_gRPC/internal/proto/music_player"
 	"google.golang.org/grpc"
@@ -19,16 +20,62 @@ func main() {
 	c := pb.NewMusicPlayerClient(conn)
 
 	// вызываем метод Play
+	//_, err = c.Play(context.Background(), &pb.Empty{})
+	//if err != nil {
+	//	log.Fatalf("Failed to play: %v", err)
+	//}
+	// вызываем метод AddSong
+	//ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	//defer cancel()
+	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+		Name:     "Song Name One",
+		Duration: int64(3 * time.Second), // в секундах
+	})
+	if err != nil {
+		log.Fatalf("Failed to add song: %v", err)
+	}
+
+	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+		Name:     "Another Song Name",
+		Duration: int64(3 * time.Second), // в секундах
+	})
+	if err != nil {
+		log.Fatalf("Failed to add song: %v", err)
+	}
+
+	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+		Name:     "Simple Song Name",
+		Duration: int64(3 * time.Second), // в секундах
+	})
+	if err != nil {
+		log.Fatalf("Failed to add song: %v", err)
+	}
+
+	// вызываем метод Play
 	_, err = c.Play(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
-
-	// вызываем метод AddSong
-	_, err = c.AddSong(context.Background(), &pb.SongRequest{
-		Name:     "Song Name",
-		Duration: 180, // в секундах
-	})
+	time.Sleep(1 * time.Second)
+	_, err = c.Next(context.Background(), &pb.Empty{})
+	if err != nil {
+		log.Fatalf("Failed to play: %v", err)
+	}
+	time.Sleep(1 * time.Second)
+	_, err = c.Prev(context.Background(), &pb.Empty{})
+	if err != nil {
+		log.Fatalf("Failed to play: %v", err)
+	}
+	time.Sleep(1 * time.Second)
+	_, err = c.Pause(context.Background(), &pb.Empty{})
+	if err != nil {
+		log.Fatalf("Failed to play: %v", err)
+	}
+	time.Sleep(1 * time.Second)
+	_, err = c.Play(context.Background(), &pb.Empty{})
+	if err != nil {
+		log.Fatalf("Failed to play: %v", err)
+	}
 	if err != nil {
 		log.Fatalf("Failed to add song: %v", err)
 	}
