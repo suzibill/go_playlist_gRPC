@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
@@ -27,56 +28,60 @@ func main() {
 	// вызываем метод AddSong
 	//ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	//defer cancel()
-	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+	ans, err := c.AddSong(context.Background(), &pb.SongRequest{
 		Name:     "Song Name One",
 		Duration: int64(3 * time.Second), // в секундах
 	})
 	if err != nil {
 		log.Fatalf("Failed to add song: %v", err)
 	}
-
-	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+	fmt.Println(ans)
+	ans, err = c.AddSong(context.Background(), &pb.SongRequest{
 		Name:     "Another Song Name",
 		Duration: int64(3 * time.Second), // в секундах
 	})
 	if err != nil {
 		log.Fatalf("Failed to add song: %v", err)
 	}
+	fmt.Println(ans)
 
-	_, err = c.AddSong(context.Background(), &pb.SongRequest{
+	ans, err = c.AddSong(context.Background(), &pb.SongRequest{
 		Name:     "Simple Song Name",
 		Duration: int64(3 * time.Second), // в секундах
 	})
 	if err != nil {
 		log.Fatalf("Failed to add song: %v", err)
 	}
+	fmt.Println(ans)
 
 	// вызываем метод Play
-	_, err = c.Play(context.Background(), &pb.Empty{})
+	ans, err = c.Play(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
+	fmt.Println(ans)
 	time.Sleep(1 * time.Second)
-	_, err = c.Next(context.Background(), &pb.Empty{})
+	ans, err = c.Next(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
+	fmt.Println(ans)
 	time.Sleep(1 * time.Second)
-	_, err = c.Prev(context.Background(), &pb.Empty{})
+	ans, err = c.Prev(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
+	fmt.Println(ans)
 	time.Sleep(1 * time.Second)
-	_, err = c.Pause(context.Background(), &pb.Empty{})
+	ans, err = c.Pause(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
+	fmt.Println(ans)
 	time.Sleep(1 * time.Second)
-	_, err = c.Play(context.Background(), &pb.Empty{})
+	ans, err = c.Play(context.Background(), &pb.Empty{})
 	if err != nil {
 		log.Fatalf("Failed to play: %v", err)
 	}
-	if err != nil {
-		log.Fatalf("Failed to add song: %v", err)
-	}
+	fmt.Println(ans)
 }
