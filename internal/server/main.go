@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"google.golang.org/grpc"
@@ -64,6 +67,16 @@ func main() {
 	defer cancel()
 	srv.Cmd = make(chan playlist.Commands)
 	go playlist.DoWork(ctx, srv.Cmd)
+
+	stopCh := make(chan os.Signal, 1)
+	signal.Notify(stopCh, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-stopCh
+		cancel()
+		s.GracefulStop()
+		close(stopCh)
+		fmt.Println("Server stopped")
+	}()
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatal(err)
