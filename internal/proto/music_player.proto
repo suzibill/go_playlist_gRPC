@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package music_player;
+
+option go_package = "/music_player";
+
+service MusicPlayer {
+  rpc play(Empty) returns (PlaylistResponse);
+  rpc pause(Empty) returns (PlaylistResponse);
+  rpc next(Empty) returns (PlaylistResponse);
+  rpc prev(Empty) returns (PlaylistResponse);
+  rpc addSong(SongRequest) returns (PlaylistResponse);
+}
+
+
+message SongRequest {
+  string name = 1;
+  int64 duration = 2;
+}
+
+message Empty {
+}
+
+message PlaylistResponse {
+  int32 code = 1;
+  string message = 2;
+}
